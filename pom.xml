@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>SkypeBot</groupId>
-  <artifactId>SkypeBot</artifactId>
+  <groupId>uk.niccossystem.skypebot</groupId>
   <version>0.0.1-SNAPSHOT</version>
   <name>SkypeBot</name>
   <description>SkypeBot by NiccosSystem</description>
@@ -15,6 +14,36 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
+      </plugin>
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>true</addMavenDescriptor>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Main-Class>uk.niccossystem.skypebot.SkypeBot</Main-Class>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -30,4 +59,5 @@
 	  <version>1.7.2</version>
 </dependency>
   </dependencies>
+  <artifactId>skypebot</artifactId>
 </project>
