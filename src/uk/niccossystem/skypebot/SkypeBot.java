@@ -13,12 +13,13 @@ public class SkypeBot {
 	 */
 	public static void main(String[] args) throws IOException, SkypeException, InterruptedException {		
 		try {
+			//Add the Skype listener.
 			Skype.addChatMessageListener(new MessageListener());
 		} catch (SkypeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (true) {
+			//Make the thread sleep a bit to avoid eating all resources.
 			Thread.sleep(20);
 		}		
 	}

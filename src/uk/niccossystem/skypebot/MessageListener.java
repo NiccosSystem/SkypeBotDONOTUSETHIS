@@ -10,9 +10,8 @@ import com.skype.*;
 public class MessageListener implements ChatMessageListener {
 	
 	
-	private static final String uhcBansUrl = "http://192.168.10.108/uhcbans/getbanned.php";
-	HashMap<Chat, String> chatTopics = new HashMap<Chat, String>();
-//	List<ChatMessage> botMessages = Wappa.getChatMessageArray();
+	private static final String uhcBansUrl = "http://79.160.84.111/uhcbans/getbanned.php";
+	private HashMap<Chat, String> chatTopics = new HashMap<Chat, String>();
 	
 	
 	public MessageListener() {
@@ -23,10 +22,9 @@ public class MessageListener implements ChatMessageListener {
 		// TODO Auto-generated method stub	
 		doCommands(arg0);
 		
+		//Topic lock code.
 		if (chatTopics.containsKey(arg0.getChat())) {
 			if (!arg0.getChat().getWindowTitle().equals(chatTopics.get(arg0.getChat()))) {
-//				botChat(arg0.getChat(), arg0.getChat().getWindowTitle());
-//				botChat(arg0.getChat(), chatTopics.get(arg0.getChat()));
 				arg0.getChat().setTopic(chatTopics.get(arg0.getChat()));
 				botChat(arg0.getChat(), "Topic is locked!");				
 			}
@@ -35,11 +33,21 @@ public class MessageListener implements ChatMessageListener {
 
 	@Override
 	public void chatMessageSent(ChatMessage arg0) throws SkypeException {
-		// TODO Auto-generated method stub
-		doCommands(arg0);		
 		
+		//Check for commands and execute them (Move to a different class?)
+		doCommands(arg0);
 		
+		//Topic lock check.
+		if (chatTopics.containsKey(arg0.getChat())) {
+			if (!arg0.getChat().getWindowTitle().equals(chatTopics.get(arg0.getChat()))) {
+				arg0.getChat().setTopic(chatTopics.get(arg0.getChat()));
+				botChat(arg0.getChat(), "Topic is locked!");				
+			}
+		}		
 		
+		//Admin commands (Going to make a better system soon where you can add admins)
+		
+		//Locks a topic. (If users topic spam)
 		if (arg0.getContent().split(" ")[0].equalsIgnoreCase(".locktopic")) {
 			if (!chatTopics.containsKey(arg0.getChat())) {
 				chatTopics.put(arg0.getChat(), arg0.getChat().getWindowTitle());
@@ -48,6 +56,8 @@ public class MessageListener implements ChatMessageListener {
 				botChat(arg0.getChat(), "Topic is already locked.");
 			}
 		}
+		
+		//Remove topic lock.
 		if (arg0.getContent().split(" ")[0].equalsIgnoreCase(".ignoretopic")) {
 			if (chatTopics.containsKey(arg0.getChat())) {
 				chatTopics.remove(arg0.getChat());
@@ -56,6 +66,8 @@ public class MessageListener implements ChatMessageListener {
 				botChat(arg0.getChat(), "Topic hasn't been locked.");
 			}
 		}
+		
+		//Clear recent bot messages.
 		if (arg0.getContent().split(" ")[0].equalsIgnoreCase(".clearmsgs")) {
 			clearMessages(arg0.getChat());
 		}
@@ -64,6 +76,7 @@ public class MessageListener implements ChatMessageListener {
 	private void doCommands(ChatMessage arg0) throws SkypeException {
 		String[] messageArray = arg0.getContent().split(" ");
 		
+		//For the /r/ultrahardcore Universal Ban List
 		if (messageArray[0].equalsIgnoreCase(".getbanned") && messageArray.length >= 2) {
 			try {
 				botChat(arg0.getChat(), getBanned(messageArray[1]));
@@ -72,68 +85,14 @@ public class MessageListener implements ChatMessageListener {
 				e.printStackTrace();
 			}			
 		}		
-		if (messageArray[0].equalsIgnoreCase(".add") && messageArray.length >= 3) {
-			
-			Chat chat = arg0.getChat();
-			double result = 0;
-			
-			for (int i = 1; i <= messageArray.length - 1; i++) {
-				try {
-				result = result + Double.valueOf(messageArray[i]);
-				} catch (NumberFormatException e) {
-					botChat(chat, arg0.getSenderDisplayName() + ": Please do only use numbers.");
-					
-				}
-			}
-			if (result == 69.0) {
-			botChat(chat, arg0.getSenderDisplayName() + ": " + String.valueOf(result) + " ;)");
-			
-			return;
-			} else {
-			botChat(chat, arg0.getSenderDisplayName() + ": " + String.valueOf(result));
-			
-			return;
-			}
-		} else if (messageArray[0].equalsIgnoreCase(".x") && messageArray.length >= 3) {
-			
-			Chat chat = arg0.getChat();
-			double result = 0;
-			
-			for (int i = 1; i <= messageArray.length - 1; i++) {
-				if (i == 1) {
-					try {
-					result = Double.valueOf(messageArray[1]);
-				} catch (NumberFormatException e) {
-					botChat(chat, arg0.getSenderDisplayName() + ": Please do only use numbers.");
-					
-					return;
-				}
-				} else {
-					try {
-					result = result * Double.valueOf(messageArray[i]);
-					} catch (NumberFormatException e) {
-						botChat(chat, arg0.getSenderDisplayName() + ": Please do only use numbers.");
-						
-						return;
-					}
-				}
-			}
-			if (result == 69.0) {
-				botChat(chat, arg0.getSenderDisplayName() + ": " + String.valueOf(result) + " ;)");
-				
-				return;
-			} else {
-				botChat(chat, arg0.getSenderDisplayName() + ": " + String.valueOf(result));
-				
-				return;
-			}
-
-		}
 		
+		//If the message contains a youtube link, find the title. (HTTPS doesn't work)
+		//Move this to the Youtube method? getTitle(Chat chat, String url)
 		if (arg0.getContent().contains("youtube.com/watch")) {
 			String[] message = arg0.getContent().split(" ");
 			String title = null;
 			Chat chat = arg0.getChat();
+			
 			for (String s : message) {
 				if (s.contains("youtube.com/watch")) {
 					try {
@@ -145,20 +104,26 @@ public class MessageListener implements ChatMessageListener {
 					}
 				}				
 			}
+			
 			if (title != null) {
 				botChat(chat, title);
 				
 				return;
 			}
+			
 			botChat(chat, "Title not found");
 			
 		}
+		
+		//SkypeBot will display your last message (Fix this; it finds messages from all chat instead of the current one.)
 		if (messageArray[0].equalsIgnoreCase(".lastmsg")) {
 			Chat chat = arg0.getChat();
 			ChatMessage[] allMsg = arg0.getSender().getAllChatMessages();
+			
 			botChat(chat, arg0.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());
 		}
 		
+		//Correct your last message
 		String[] slashMessage = arg0.getContent().split("/");
 		if (slashMessage[0].equalsIgnoreCase(".s") && slashMessage.length == 3) {
 			Chat chat = arg0.getChat();
@@ -169,6 +134,8 @@ public class MessageListener implements ChatMessageListener {
 			botChat(chat, arg0.getSenderDisplayName() + " meant: " + msg);
 			
 		}
+		
+		//Remove this? Some people might find it annoying.
 		if (messageArray[0].equalsIgnoreCase(".pi")) {
 			Chat chat = arg0.getChat();
 			String pi = "3.14159265358979323846264338327950288419716939937510582" +
@@ -181,6 +148,7 @@ public class MessageListener implements ChatMessageListener {
 		}
 	}
 	
+	//Method to find the title of a Youtube video. Possible rename to getYoutubeTitle.
  	private String getTitle(String url) throws IOException {
  		if (!url.startsWith("http://") && !url.startsWith("https://")) {
  			url = "http://" + url;
@@ -191,6 +159,7 @@ public class MessageListener implements ChatMessageListener {
 		return combined;
 	}
  	
+ 	//Universal Ban List information getter.
  	public String getBanned(String user) throws IOException {
 		String userCheck = uhcBansUrl + "?user=" + user;		
 		Document doc = Jsoup.connect(userCheck).get();			
@@ -211,6 +180,8 @@ public class MessageListener implements ChatMessageListener {
  		
  	}
 
+ 	//Use this for all chat; it specifies that it is the bot. (If the last bot message equals the current one, return.
+ 	//This is because the Skype API for Java sometimes calls the onMessageReceived hook twice.
 	private void botChat(Chat chat, String message) throws SkypeException {
 		
 		ChatMessage[] recent = chat.getRecentChatMessages();
@@ -224,6 +195,7 @@ public class MessageListener implements ChatMessageListener {
 		chat.send("[SkypeBot] " + message);		
 	}
 	
+	//Clear all recent bot messages.
 	private void clearMessages(Chat chat) throws SkypeException {		
 		ChatMessage[] recent = chat.getRecentChatMessages();		
 		for (ChatMessage m : recent) {			
