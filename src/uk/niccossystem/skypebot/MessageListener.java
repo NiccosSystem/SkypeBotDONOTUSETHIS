@@ -1,7 +1,10 @@
 package uk.niccossystem.skypebot;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -12,14 +15,20 @@ public class MessageListener implements ChatMessageListener {
 	
 	private static final String uhcBansUrl = "http://79.160.84.111/uhcbans/getbanned.php";
 	private HashMap<Chat, String> chatTopics = new HashMap<Chat, String>();
-	
+	private List<ChatMessage> receivedMessages = new ArrayList<ChatMessage>();
 	
 	public MessageListener() {
 	}
 	
 	@Override
-	public void chatMessageReceived(ChatMessage arg0) throws SkypeException {
-		// TODO Auto-generated method stub	
+	public void chatMessageReceived(ChatMessage arg0) throws SkypeException, NullPointerException {
+		
+		if (receivedMessages.contains(arg0)) {
+			return;
+		}
+		
+		receivedMessages.add(arg0);
+		
 		doCommands(arg0);
 		
 		//Topic lock code.
@@ -69,7 +78,7 @@ public class MessageListener implements ChatMessageListener {
 		
 		//Clear recent bot messages.
 		if (arg0.getContent().split(" ")[0].equalsIgnoreCase(".clearmsgs")) {
-			clearMessages(arg0.getChat());
+			clearMessages(arg0.getChat(), arg0.getSender());
 		}
 	}
 	
@@ -119,8 +128,12 @@ public class MessageListener implements ChatMessageListener {
 		if (messageArray[0].equalsIgnoreCase(".lastmsg")) {
 			Chat chat = arg0.getChat();
 			ChatMessage[] allMsg = arg0.getSender().getAllChatMessages();
-			
-			botChat(chat, arg0.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());
+			for (int i = allMsg.length - 1; i >= 0; i--) {
+				if (allMsg[i].getChat().equals(arg0.getChat())) {
+					botChat(chat, arg0.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());
+					break;
+				}
+			}
 		}
 		
 		//Correct your last message
@@ -182,24 +195,17 @@ public class MessageListener implements ChatMessageListener {
 
  	//Use this for all chat; it specifies that it is the bot. (If the last bot message equals the current one, return.
  	//This is because the Skype API for Java sometimes calls the onMessageReceived hook twice.
-	private void botChat(Chat chat, String message) throws SkypeException {
-		
+	private void botChat(Chat chat, String message) throws SkypeException {		
 		ChatMessage[] recent = chat.getRecentChatMessages();
-		
-		for (int i = recent.length - 1; i >= 0; i--) {
-			
-			if (recent[i].getContent().equals("[SkypeBot] " + message)) return;
-			
-		}
 		
 		chat.send("[SkypeBot] " + message);		
 	}
 	
 	//Clear all recent bot messages.
-	private void clearMessages(Chat chat) throws SkypeException {		
-		ChatMessage[] recent = chat.getRecentChatMessages();		
-		for (ChatMessage m : recent) {			
-			if (m.getContent().startsWith("[SkypeBot]")) {
+	private void clearMessages(Chat chat, User user) throws SkypeException {		
+		ChatMessage[] messages = chat.getAllChatMessages();		
+		for (ChatMessage m : messages) {			
+			if (m.getContent().startsWith("[SkypeBot]") && m.getSender().equals(user)) {
 				m.setContent("");
 			}			
 		}		
