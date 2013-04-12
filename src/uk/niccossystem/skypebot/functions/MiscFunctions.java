@@ -24,12 +24,12 @@ public class MiscFunctions implements FunctionsClass {
 	}
 	
 	//SkypeBot will display your last message (Fix this; it finds messages from all chat instead of the current one.)	
-	public void lastMessage(Chat chat, User user) {
+	public void lastMessage(ChatMessage msg) {
 		try {
-			ChatMessage[] allMsg = user.getAllChatMessages();
+			ChatMessage[] allMsg = msg.getSender().getAllChatMessages();
 				for (int i = allMsg.length - 1; i >= 0; i--) {
-						if (allMsg[i].getChat().equals(chat)) {
-							bot.chat(chat, user.getDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());	
+						if (allMsg[i].getChat().equals(msg.getChat())) {
+							bot.chat(msg.getChat(), msg.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());	
 							return;
 						}
 				}
@@ -54,5 +54,21 @@ public class MiscFunctions implements FunctionsClass {
 		} catch (SkypeException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+	
+	public void convertToSubReddit(ChatMessage message) {
+		System.out.println("here atleast");
+		try {
+			System.out.println("In try/catch");
+			String[] messageArray = message.getContent().split(" ");
+			
+			if (messageArray.length == 2) {				
+				bot.chat(message.getChat(), "Subreddit " + messageArray[1] + ": http://reddit.com/r/" + messageArray[1]);	
+				return;					
+			}		
+		} catch (SkypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
 }

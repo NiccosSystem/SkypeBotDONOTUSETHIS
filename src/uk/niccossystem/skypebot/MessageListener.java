@@ -60,27 +60,33 @@ public class MessageListener implements ChatMessageListener {
 		
 		youtubeFunctions.checkForVideo(chat, message.getContent());
 		
-		try {
+		if (message.getContent().startsWith("\\.")) {
 			command = message.getContent().substring(2);
-		} catch (SkypeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
-		
+		if (command == null) {
+			System.out.println("command is nil!");
+			return;
+		}
 		
 		switch (command) {
 		case "lastmsg":
-			miscFunctions.lastMessage(chat, user);
+			miscFunctions.lastMessage(message);
 			break;
 		case "getublban":
-			uhcFunctions.getBanned(chat, messageArgs);
+			uhcFunctions.getBanned(message);
 			break;	
 		case "getmatch":
 			uhcFunctions.getMatch(chat);
 			break;
 		case "setmatch":
 			uhcFunctions.setMatch(chat, messageArgs);
+			break;
+		case "reddit":
+			miscFunctions.convertToSubReddit(message);
+			break;
+		default:
+			System.out.println("fuck you");
+			break;
 		}
 		
 		
