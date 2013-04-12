@@ -1,5 +1,17 @@
 package uk.niccossystem.skypebot.functions;
 
-public interface FunctionsClass {
-	public static BaseBotFunctions bot = new BaseBotFunctions();
+import com.skype.Chat;
+import com.skype.SkypeException;
+
+public class FunctionsClass {
+	
+	public void chat(Chat chat, String message) {		
+		try {
+			chat.send("[SkypeBot] " + message);
+		} catch (SkypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}	
+	
 }

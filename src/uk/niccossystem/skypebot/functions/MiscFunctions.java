@@ -3,9 +3,8 @@ package uk.niccossystem.skypebot.functions;
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
-import com.skype.User;
 
-public class MiscFunctions implements FunctionsClass {
+public class MiscFunctions extends FunctionsClass {
 	
 	//Topic lock check.
 	public void topicLockCheck(Chat chat) {
@@ -13,11 +12,10 @@ public class MiscFunctions implements FunctionsClass {
 			try {
 				if (!chat.getWindowTitle().equals(AdminFunctions.chatTopics.get(chat))) {
 					chat.setTopic(AdminFunctions.chatTopics.get(chat));
-					bot.chat(chat, "Topic is locked!");	
+					chat(chat, "Topic is locked!");	
 					return;
 				}
 			} catch (SkypeException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -29,7 +27,7 @@ public class MiscFunctions implements FunctionsClass {
 			ChatMessage[] allMsg = msg.getSender().getAllChatMessages();
 				for (int i = allMsg.length - 1; i >= 0; i--) {
 						if (allMsg[i].getChat().equals(msg.getChat())) {
-							bot.chat(msg.getChat(), msg.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());	
+							chat(msg.getChat(), msg.getSenderDisplayName() + " said at " + allMsg[allMsg.length - 2].getTime() + ": \n" + allMsg[allMsg.length - 2].getContent());	
 							return;
 						}
 				}
@@ -48,7 +46,7 @@ public class MiscFunctions implements FunctionsClass {
 				String msg = allMsg[allMsg.length - 2].getContent();
 				msg = msg.replaceAll(slashMessage[1], slashMessage[2]);
 					
-				bot.chat(chat, arg0.getSenderDisplayName() + " meant: " + msg);
+				chat(chat, arg0.getSenderDisplayName() + " meant: " + msg);
 					
 			}
 		} catch (SkypeException e) {
@@ -57,17 +55,14 @@ public class MiscFunctions implements FunctionsClass {
 	}
 	
 	public void convertToSubReddit(ChatMessage message) {
-		System.out.println("here atleast");
 		try {
-			System.out.println("In try/catch");
 			String[] messageArray = message.getContent().split(" ");
 			
 			if (messageArray.length == 2) {				
-				bot.chat(message.getChat(), "Subreddit " + messageArray[1] + ": http://reddit.com/r/" + messageArray[1]);	
+				chat(message.getChat(), "Subreddit \"" + messageArray[1] + "\": http://reddit.com/r/" + messageArray[1]);	
 				return;					
 			}		
 		} catch (SkypeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 	}

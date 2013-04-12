@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 
 import com.skype.Chat;
 
-public class YoutubeFunctions implements FunctionsClass {
+public class YoutubeFunctions extends FunctionsClass {
 	
 	public void checkForVideo(Chat chat, String message) {
 		if (message.contains("youtube.com/watch")) {
@@ -20,10 +20,10 @@ public class YoutubeFunctions implements FunctionsClass {
 				}				
 			}			
 			if (title != null) {
-				bot.chat(chat, title);				
+				chat(chat, title);				
 				return;
 			}			
-			bot.chat(chat, "Title not found");			
+			chat(chat, "Title not found");			
 		}
 	}
 

@@ -9,7 +9,7 @@ import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.SkypeException;
 
-public class UHCFunctions implements FunctionsClass {
+public class UHCFunctions extends FunctionsClass {
 	
 	String uhcBansUrl = "http://192.168.10.108/uhcbans/getbanned.php";
 	String currentMatch = null;
@@ -24,15 +24,16 @@ public class UHCFunctions implements FunctionsClass {
 			
 				if (banned != null) {
 					if (banned.equalsIgnoreCase("1")) {
-						bot.chat(message.getChat(), "Player is on the UBL. \n" +
-								"Player: " + doc.select("p[class=user]").text() + "\n" +
+						chat(message.getChat(), "Player is on the NBL (Nicco Ban List). \n" +
+						"Player: " + doc.select("p[class=user]").text() + "\n" +
 						"Banned: " + (doc.select("p[class=isbanned]").text().equalsIgnoreCase("1") ? "Yes" : "No") + "\n" +
 						"Reason: " + doc.select("p[class=reason]").text() + "\n" +
 						"Length: " + doc.select("p[class=length]").text() + "\n" +
 						"Date of ban: " + doc.select("p[class=date]").text());
+						return;
 					}
 				}
-				bot.chat(message.getChat(), "Player is not on the UBL.");
+				chat(message.getChat(), "Player is not on the NBL (Nicco Ban List).");
 			}
 		} catch (SkypeException e) {
 			// TODO Auto-generated catch block
@@ -41,14 +42,14 @@ public class UHCFunctions implements FunctionsClass {
 	}
 
 	public void getMatch(Chat chat) {
-		bot.chat(chat, "Current Match: " + currentMatch);
+		chat(chat, "Current Match: " + currentMatch);
 	}	
 	public void setMatch(Chat chat, String[] message) {
 		if (message.length < 2) {
-			bot.chat(chat, "Not enough arguments!");
+			chat(chat, "Not enough arguments!");
 			return;
 		}
 		currentMatch = message.toString().replaceFirst("\\.setmatch ", "");
-		bot.chat(chat, "Current match set.");
+		chat(chat, "Current match set.");
 	}
 }

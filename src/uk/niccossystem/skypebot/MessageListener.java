@@ -19,6 +19,8 @@ public class MessageListener implements ChatMessageListener {
 	private UHCFunctions uhcFunctions = new UHCFunctions();
 	private YoutubeFunctions youtubeFunctions = new YoutubeFunctions();
 	
+	
+	
 	public MessageListener() {
 	}
 	
@@ -42,6 +44,9 @@ public class MessageListener implements ChatMessageListener {
 	@Override
 	public void chatMessageSent(ChatMessage arg0) throws SkypeException {		
 		
+		if (arg0.getContent().startsWith("\\.clearmsgs")) {
+			adminFunctions.clearBotMessages(arg0.getChat(), arg0.getSender());
+		}
 		
 		try {
 			doCommands(arg0);
@@ -60,34 +65,33 @@ public class MessageListener implements ChatMessageListener {
 		
 		youtubeFunctions.checkForVideo(chat, message.getContent());
 		
-		if (message.getContent().startsWith("\\.")) {
-			command = message.getContent().substring(2);
-		}
-		if (command == null) {
-			System.out.println("command is nil!");
-			return;
-		}
+		if (message.getContent().startsWith("\\.")) command = message.getContent().substring(2);
 		
-		switch (command) {
-		case "lastmsg":
-			miscFunctions.lastMessage(message);
-			break;
-		case "getublban":
-			uhcFunctions.getBanned(message);
-			break;	
-		case "getmatch":
-			uhcFunctions.getMatch(chat);
-			break;
-		case "setmatch":
-			uhcFunctions.setMatch(chat, messageArgs);
-			break;
-		case "reddit":
-			miscFunctions.convertToSubReddit(message);
-			break;
-		default:
-			System.out.println("fuck you");
-			break;
-		}
+		if (command == null) return;
+		
+		
+		if (command.split(" ")[0].equalsIgnoreCase("getnblban")) uhcFunctions.getBanned(message);
+		
+		if (command.split(" ")[0].equalsIgnoreCase("reddit") && command.split(" ").length == 2)
+		miscFunctions.convertToSubReddit(message);
+		
+		
+		
+//		switch (command) {
+//		case "lastmsg":
+//			miscFunctions.lastMessage(message);
+//		case "getublban":
+//			uhcFunctions.getBanned(message);
+//		case "getmatch":
+//			uhcFunctions.getMatch(chat);
+//		case "setmatch":
+//			uhcFunctions.setMatch(chat, messageArgs);
+//		case "reddit":
+//			miscFunctions.convertToSubReddit(message);
+//		default:
+//			System.out.println("fuck you");
+//			break;
+//		}
 		
 		
 		

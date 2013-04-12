@@ -7,7 +7,7 @@ import com.skype.ChatMessage;
 import com.skype.SkypeException;
 import com.skype.User;
 
-public class AdminFunctions implements FunctionsClass {
+public class AdminFunctions extends FunctionsClass {
 	
 	public static HashMap<Chat, String> chatTopics = new HashMap<Chat, String>();
 
@@ -30,15 +30,15 @@ public class AdminFunctions implements FunctionsClass {
 		if (!chatTopics.containsKey(chat)) {
 			try {
 				chatTopics.put(chat, chat.getWindowTitle());
-				bot.chat(chat, "Topic locked.");
+				chat(chat, "Topic locked.");
 			} catch (SkypeException e) {
 				// TODO Auto-generated catch block
-				bot.chat(chat, "Topic lock failed.");
+				chat(chat, "Topic lock failed.");
 				e.printStackTrace();
 			}
 			
 		} else {
-			bot.chat(chat, "Topic is already locked.");
+			chat(chat, "Topic is already locked.");
 		}
 	}
 			
@@ -46,9 +46,9 @@ public class AdminFunctions implements FunctionsClass {
 	public void removeTopicLock(Chat chat) {
 		if (chatTopics.containsKey(chat)) {
 			chatTopics.remove(chat);
-			bot.chat(chat, "Topic-lock removed.");
+			chat(chat, "Topic-lock removed.");
 		} else {
-			bot.chat(chat, "Topic hasn't been locked.");
+			chat(chat, "Topic hasn't been locked.");
 		}
 	}
 }
