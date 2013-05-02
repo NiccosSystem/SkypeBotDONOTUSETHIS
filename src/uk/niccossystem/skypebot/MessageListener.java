@@ -13,7 +13,7 @@ import com.skype.*;
 
 public class MessageListener implements ChatMessageListener {
 	
-	private List<ChatMessage> receivedMessages = new ArrayList<ChatMessage>();
+	public static List<ChatMessage> receivedMessages = new ArrayList<ChatMessage>();
 	private AdminFunctions adminFunctions = new AdminFunctions();
 	private MiscFunctions miscFunctions = new MiscFunctions();
 	private UHCFunctions uhcFunctions = new UHCFunctions();
@@ -27,15 +27,12 @@ public class MessageListener implements ChatMessageListener {
 	@Override
 	public void chatMessageReceived(ChatMessage arg0) throws SkypeException, NullPointerException {
 		
-		if (receivedMessages.contains(arg0)) {
-			return;
-		}		
+		if (receivedMessages.contains(arg0)) return;
 		receivedMessages.add(arg0);	
 		
 		try {
 			doCommands(arg0);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -43,15 +40,9 @@ public class MessageListener implements ChatMessageListener {
 
 	@Override
 	public void chatMessageSent(ChatMessage arg0) throws SkypeException {		
-		
-		if (arg0.getContent().startsWith("\\.clearmsgs")) {
-			adminFunctions.clearBotMessages(arg0.getChat(), arg0.getSender());
-		}
-		
 		try {
 			doCommands(arg0);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}	
@@ -59,39 +50,44 @@ public class MessageListener implements ChatMessageListener {
 	public void doCommands(ChatMessage message) throws SkypeException, IOException {
 		String command = null;
 		Chat chat = message.getChat();
-		User user = message.getSender();
-		String[] messageArgs = message.getContent().split(" ");
-//		String[] commandArgs = messageArgs.toString().substring(messageArgs[0].length() + 1).split(" ");
+		String user = message.getSenderDisplayName();
 		
 		youtubeFunctions.checkForVideo(chat, message.getContent());
 		
-		if (message.getContent().startsWith("\\.")) command = message.getContent().substring(2);
-		
+		if (message.getContent().startsWith("]")) command = message.getContent().substring(1).split(" ")[0];
 		if (command == null) return;
 		
+		String[] stripped = message.getContent().replace("]" + command + " ", "").split(" ");		
 		
-		if (command.split(" ")[0].equalsIgnoreCase("getnblban")) uhcFunctions.getBanned(message);
-		
-		if (command.split(" ")[0].equalsIgnoreCase("reddit") && command.split(" ").length == 2)
-		miscFunctions.convertToSubReddit(message);
-		
-		
-		
-//		switch (command) {
-//		case "lastmsg":
-//			miscFunctions.lastMessage(message);
-//		case "getublban":
-//			uhcFunctions.getBanned(message);
-//		case "getmatch":
-//			uhcFunctions.getMatch(chat);
-//		case "setmatch":
-//			uhcFunctions.setMatch(chat, messageArgs);
-//		case "reddit":
-//			miscFunctions.convertToSubReddit(message);
-//		default:
-//			System.out.println("fuck you");
-//			break;
-//		}
+		switch (command) {
+		case "lastmsg":
+			miscFunctions.lastMessage(message);
+			break;
+		case "getnblban":
+			uhcFunctions.getBanned(message);
+			break;
+		case "match":
+			uhcFunctions.getMatch(chat);
+			break;
+		case "setmatch":
+			uhcFunctions.setMatch(chat, stripped);
+			break;
+		case "reddit":
+			miscFunctions.convertToSubReddit(message);
+			break;
+		case "icelandify":
+			miscFunctions.icelandify(chat, stripped, user);
+			break;
+		case "derpify":
+			miscFunctions.derpify(chat, stripped, user);
+			break;
+		case "help":
+			miscFunctions.help(chat);
+			break;
+		default:
+			miscFunctions.chat(chat, "No such command! Type ]help for a list of commands!");
+			break;
+		}
 		
 		
 		

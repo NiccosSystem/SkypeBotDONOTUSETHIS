@@ -12,7 +12,7 @@ import com.skype.SkypeException;
 public class UHCFunctions extends FunctionsClass {
 	
 	String uhcBansUrl = "http://192.168.10.108/uhcbans/getbanned.php";
-	String currentMatch = null;
+	String currentMatch = "No match!";
 
 	//For the /r/ultrahardcore Universal Ban List
 	public void getBanned(ChatMessage message) throws IOException {
@@ -44,12 +44,22 @@ public class UHCFunctions extends FunctionsClass {
 	public void getMatch(Chat chat) {
 		chat(chat, "Current Match: " + currentMatch);
 	}	
-	public void setMatch(Chat chat, String[] message) {
-		if (message.length < 2) {
+	
+	public void setMatch(Chat chat, String[] match) {
+		if (match.length < 1) {
 			chat(chat, "Not enough arguments!");
 			return;
 		}
-		currentMatch = message.toString().replaceFirst("\\.setmatch ", "");
+		String response = "";
+		for (String s : match) {
+			response += s + " ";
+		}
+		currentMatch = response;
 		chat(chat, "Current match set.");
+	}
+	
+	public void removeMatch(Chat chat, String[] message) {
+		currentMatch = "No match!";
+		chat(chat, "Removed set match.");
 	}
 }
