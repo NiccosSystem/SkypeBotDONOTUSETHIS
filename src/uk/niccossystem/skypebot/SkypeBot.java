@@ -20,16 +20,15 @@ public class SkypeBot {
 			//Add the Skype listener.
 			Skype.addChatMessageListener(new MessageListener());
 			Skype.addChatMessageEditListener(new EditListener());
+			
 			File file = new File("./settings.properties");
 			if (!file.exists()) {
 				Properties props = new Properties();
 				props.setProperty("admins", "");
 				props.store(new FileOutputStream("settings.properties"), null);
 			}
-		} catch (SkypeException e) {
+		} catch (SkypeException | IOException e) {
 			e.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
 		}
 		while (true) {
 			//Make the thread sleep a bit to avoid eating all resources.
